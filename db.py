@@ -31,8 +31,20 @@ def get_patients():
     conn.close()
     return rows
 
+def update_patient_records(patient_id , name , age , disease):
+    conn = sqlite3.connect("hospital.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE patient_records SET name = ? , age = ? , disease = ?
+        WHERE patient_id = ?
+    """, (name , age , disease , patient_id))
+    conn.commit()
+    conn.close()
+
 if __name__ == "__main__":
     init_db()
     # add_patient("Rahul" , 28, "Fever")
     # print("Test successful")
+    print(get_patients())
+    update_patient_records(1 ,"Hero" , 31 , "Malaria")
     print(get_patients())
