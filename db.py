@@ -23,7 +23,16 @@ def add_patient(name , age , disease):
     conn.commit()
     conn.close()
 
+def get_patients():
+    conn = sqlite3.connect("hospital.db")
+    cursor = conn.cursor()
+    cursor.execute("select * from patient_records")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
 if __name__ == "__main__":
     init_db()
-    add_patient("Rahul" , 28, "Fever")
-    print("Test successful")
+    # add_patient("Rahul" , 28, "Fever")
+    # print("Test successful")
+    print(get_patients())
