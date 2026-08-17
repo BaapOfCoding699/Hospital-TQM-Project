@@ -41,10 +41,21 @@ def update_patient_records(patient_id , name , age , disease):
     conn.commit()
     conn.close()
 
+def delete_patient_records(patient_id):
+    conn = sqlite3.connect("hospital.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        DELETE FROM patient_records
+        WHERE patient_id = ?
+    """ , (patient_id,))
+    conn.commit()
+    conn.close()
+
 if __name__ == "__main__":
     init_db()
     # add_patient("Rahul" , 28, "Fever")
     # print("Test successful")
-    print(get_patients())
-    update_patient_records(1 ,"Hero" , 31 , "Malaria")
+    # print(get_patients())
+    # update_patient_records(1 ,"Hero" , 31 , "Malaria")
+    delete_patient_records(2)
     print(get_patients())
