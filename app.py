@@ -38,10 +38,15 @@ with tab3:
             st.success(f"Update {new_Name} sucessful!")
 
 with tab4:
-    with st.form("delete_patient_records", clear_on_submit=True):
-        patient_id = st.number_input("Patient ID to remove -", step=1 , min_value=1)
-        delete_btn = st.form_submit_button("Delete Patient Records")
+    data = db.get_patients()
+    if data:
+        exsisting_ids = [item[0] for item in data]
+        with st.form("delete_patient_records", clear_on_submit=True):
+            patient_id = st.selectbox("Patient ID to remove -", exsisting_ids)
+            delete_btn = st.form_submit_button("Delete Patient Records")
 
-        if delete_btn:
-            db.delete_patient_records(int(patient_id))
-            st.warning(f"Patient #{patient_id} has been Deleted.")
+            if delete_btn:
+                db.delete_patient_records(patient_id)
+                st.warning(f"Patient #{patient_id} has been Deleted.")
+    else:
+        st.info("No Patient avialiable to delete.")
