@@ -1,6 +1,7 @@
 import streamlit as st
 import db
 import pandas as pd
+import io
 
 db.init_db()
 st.title("🏥 Hospital Management System")
@@ -29,16 +30,25 @@ with tab1:
         df = pd.DataFrame(data , columns=["Patient_ID" , "Name" , "Age" , "Disease" , "Addmission Date"])
         search_query = st.text_input("Search By Patient Name or Disease")
         if search_query:
-            filtered_df = df[
+            display_df = df[
                     df["Name"].str.contains(search_query , case = False , na = False) |
                     df["Disease"].str.contains(search_query , case = False , na = False)
             ]
-            st.dataframe(filtered_df , use_container_width=True)
         else:
-            st.dataframe(df , use_container_width=True)
+            display_df = df
+        st.dataframe(display_df , use_container_width=True)
+        excel_data = io.BytesIO()
+        with pd.ExcelWriter(excel_data , engine="openpyxl") as writer:
+            display_df.to_excel(writer , index = False , sheet_name = "Patients")
+        st.download_button(
+            label="Download Patient Records as Excel",
+            data=excel_data.getvalue(),
+            file_name="Pateint Records.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
     else:
-        st.info("No Data Found")
-
+            st.info("No Data Found")
+    
 with tab2:
     with st.form("patient_form" , clear_on_submit=True):
         patient_Name = st.text_input("Patient Name")
