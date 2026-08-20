@@ -23,10 +23,19 @@ if data:
 tab1 , tab2 ,  tab3 , tab4 = st.tabs(["View Patient Record" , "Add Patient Record" , "Update Patient Record" , "Delete Patient Record"])
 
 with tab1:
+    
     data = db.get_patients()
     if data:
         df = pd.DataFrame(data , columns=["Patient_ID" , "Name" , "Age" , "Disease" , "Addmission Date"])
-        st.dataframe(df)
+        search_query = st.text_input("Search By Patient Name or Disease")
+        if search_query:
+            filtered_df = df[
+                    df["Name"].str.contains(search_query , case = False , na = False) |
+                    df["Disease"].str.contains(search_query , case = False , na = False)
+            ]
+            st.dataframe(filtered_df , use_container_width=True)
+        else:
+            st.dataframe(df , use_container_width=True)
     else:
         st.info("No Data Found")
 
