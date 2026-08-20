@@ -4,6 +4,22 @@ import pandas as pd
 
 db.init_db()
 st.title("🏥 Hospital Management System")
+
+data = db.get_patients()
+if data:
+    total_Patients = len(data)
+    ages = [row[2] for row in data]
+    avg_age = round(sum(ages) / len(ages) , 1)
+    disease = [ row[3] for row in data]
+    top_disease = max(set(disease) , key = disease.count)
+    col1 , col2 , col3 = st.columns(3)
+    with col1:
+        st.metric( label="Total Patients" , value=total_Patients)
+    with col2:
+        st.metric( label="Average Age" , value=f"{avg_age} yrs")
+    with col3:
+        st.metric( label="Most Common Disease" , value=top_disease)
+
 tab1 , tab2 ,  tab3 , tab4 = st.tabs(["View Patient Record" , "Add Patient Record" , "Update Patient Record" , "Delete Patient Record"])
 
 with tab1:
