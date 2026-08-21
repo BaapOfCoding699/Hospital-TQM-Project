@@ -16,10 +16,10 @@ def init_db():
     conn.close()
     print("Datebase ready!")
 
-def add_patient(name , age , disease):
+def add_patient(name , age , disease , admission_date):
     conn = sqlite3.connect("hospital.db")
     cursor = conn.cursor()
-    cursor.execute(" INSERT INTO patient_records (name , age , disease) VALUES (? , ?, ?)" , (name , age , disease))
+    cursor.execute(" INSERT INTO patient_records (name , age , disease , admission_date) VALUES (? , ?, ?, ?)" , (name , age , disease , admission_date))
     conn.commit()
     conn.close()
 

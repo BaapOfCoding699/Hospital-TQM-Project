@@ -2,6 +2,7 @@ import streamlit as st
 import db
 import pandas as pd
 import io
+import datetime
 
 db.init_db()
 st.title("🏥 Hospital Management System")
@@ -27,15 +28,26 @@ with tab1:
     
     data = db.get_patients()
     if data:
-        df = pd.DataFrame(data , columns=["Patient_ID" , "Name" , "Age" , "Disease" , "Addmission Date"])
+        df = pd.DataFrame(data , columns=["Patient_ID" , "Name" , "Age" , "Disease" , "Admission Date"])
         search_query = st.text_input("Search By Patient Name or Disease")
+        date_range = st.date_input(
+                    "Filter by admission Date Range",
+                    value=(datetime.date.today() - datetime.timedelta(days=30) , datetime.date.today())
+        )
+        display_df = df
         if search_query:
             display_df = df[
                     df["Name"].str.contains(search_query , case = False , na = False) |
                     df["Disease"].str.contains(search_query , case = False , na = False)
             ]
-        else:
-            display_df = df
+        if len(date_range) == 2:
+            start_date , end_date = date_range
+            display_df["Admission Date"] = pd.to_datetime(df["Admission Date"] , format="mixed").dt.date
+            display_df = display_df[
+                (df["Admission Date"] >= start_date) &
+                (df["Admission Date"] <= end_date)
+            ]
+
         st.dataframe(display_df , use_container_width=True)
         excel_data = io.BytesIO()
         with pd.ExcelWriter(excel_data , engine="openpyxl") as writer:
@@ -54,10 +66,12 @@ with tab2:
         patient_Name = st.text_input("Patient Name")
         patient_Age = st.number_input("Patient Age", min_value=0 , max_value=120 , step=1 )
         patient_Disease = st.text_input("Patient Disease")
+        admission_date = st.date_input("Admission Date", value=datetime.date.today())
+        date_str = admission_date.strftime("%Y-%m-%d")
         submit_btn = st.form_submit_button("Add Patient Details")
 
         if submit_btn:
-            db.add_patient(patient_Name , int(patient_Age) , patient_Disease)
+            db.add_patient(patient_Name , int(patient_Age) , patient_Disease , date_str)
             st.success(f"Added {patient_Name} sucessfully!")
 
 with tab3:
